@@ -3,6 +3,9 @@
 # I-JEPA: https://github.com/facebookresearch/ijepa
 # --------------------------------------------------------
 
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import os
 
@@ -47,9 +50,7 @@ from src.datasets.ucla import make_ucla
 from src.helper import (
     load_checkpoint,
     init_model,
-    init_opt,
-    get_args)
-
+    init_opt)
 
 # --
 log_timings = True
@@ -206,6 +207,13 @@ def main(args, resume_preempt=False):
     ipe = len(unsupervised_loader)
     print(f'number of batches per epoch: {ipe}')
 
+    print(f"DEBUG: Nombre de batches réels : {len(unsupervised_loader)}")
+    if len(unsupervised_loader) == 0:
+        import glob
+        files = glob.glob('data/timeseries/*.npy')
+        print(f"DEBUG: Fichiers .npy trouvés par glob : {len(files)}")
+
+
     # -- init optimizer and scheduler
     optimizer, scaler, scheduler, wd_scheduler = init_opt(
         encoder=encoder,
@@ -221,9 +229,12 @@ def main(args, resume_preempt=False):
         ipe_scale=ipe_scale,
         use_bfloat16=use_bfloat16,
         accumulation_steps=accumulation_steps)
-    encoder = DistributedDataParallel(encoder, static_graph=True)
-    predictor = DistributedDataParallel(predictor, static_graph=True)
-    target_encoder = DistributedDataParallel(target_encoder)
+
+    if world_size > 1:
+
+        encoder = DistributedDataParallel(encoder, static_graph=True)
+        predictor = DistributedDataParallel(predictor, static_graph=True)
+        target_encoder = DistributedDataParallel(target_encoder)
     for p in target_encoder.parameters():
         p.requires_grad = False
 
@@ -275,6 +286,7 @@ def main(args, resume_preempt=False):
         logger.info('Epoch %d' % (epoch + 1))
 
         # -- update distributed-data-loader epoch
+    if unsupervised_sampler is not None:
         unsupervised_sampler.set_epoch(epoch)
 
         loss_meter = AverageMeter()
@@ -412,11 +424,25 @@ def main(args, resume_preempt=False):
         # -- Save Checkpoint after every epoch
         logger.info('avg. loss %.3f' % loss_meter.avg)
         save_checkpoint(epoch+1)
+def get_args():
+    import argparse
+    import yaml
+    parser = argparse.ArgumentParser(description='I-JEPA training')
+    parser.add_argument('--config', type=str, help='Path to the config file', required=True)
+    
+    # On parse l'argument --config
+    cmd_args = parser.parse_args()
+    
+    # On charge le contenu du YAML
+    with open(cmd_args.config, 'r') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    
+    return config
 
 
 if __name__ == "__main__":
-    main()
-
+    args = get_args()  # On récupère les arguments (vérifie si la fonction s'appelle bien get_args)
+    main(args)         # On les passe au main
 
 '''
     if mask_mode == 'roi_mask':

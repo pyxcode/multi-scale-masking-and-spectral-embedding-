@@ -1,0 +1,49 @@
+# configs/ucla.yaml
+meta:
+  use_bfloat16: true
+  use_sigreg: true        # false = smooth_l1 only (Brain-JEPA original)
+  use_multiscale: true    # false = single-scale masking (Brain-JEPA original)
+  accumulation_steps: 8
+  attn_mode: normal   # flash_attn requires CUDA
+  add_w: origin
+  model_name: vit_small
+  pred_depth: 6
+  pred_emb_dim: 384
+  mask_mode: roi_mask
+  load_checkpoint: false
+  read_checkpoint: null
+  use_standatdization: false
+  downsample: false
+
+data:
+  batch_size: 8
+  pin_mem: true
+  num_workers: 8
+  crop_size: [400, 160]
+  gradient_csv_path: null
+
+mask:
+  patch_size: 16
+  enc_mask_scale: [0.84, 0.84]
+  pred_mask_R_scale: [0.45, 0.6]
+  pred_mask_T_scale: [0.15, 0.3]
+  pred_mask_T_roi_scale: [0.2, 0.6]
+  pred_mask_R_roi_scale: [0.15, 0.3]
+  multiscale_ts_scales: [0.03, 0.15, 0.45]
+  allow_overlap: false
+  min_keep: 4
+
+optimization:
+  epochs: 50
+  warmup: 5
+  start_lr: 0.0002
+  ref_lr: 0.001
+  final_lr: 0.00001
+  weight_decay: 0.04
+  final_weight_decay: 0.4
+  ema: [0.996, 1.0]
+  ipe_scale: 1.0
+
+logging:
+  folder: ./logs/ucla
+  write_tag: ucla_train

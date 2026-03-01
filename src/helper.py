@@ -4,17 +4,19 @@
 # --------------------------------------------------------
 
 
+import argparse
 import logging
 import sys
+import yaml
 
 import torch
 
-import src.models.vision_transformer as vit
-from src.utils.schedulers import (
+import models.vision_transformer as vit
+from utils.schedulers import (
     WarmupCosineSchedule,
     CosineWDSchedule)
 
-from src.utils.tensors import trunc_normal_
+from utils.tensors import trunc_normal_
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger()
@@ -169,3 +171,12 @@ def init_opt(
         T_max=int(ipe_scale*num_epochs*iterations_per_epoch/accumulation_steps))
     scaler = torch.cuda.amp.GradScaler() if use_bfloat16 else None
     return optimizer, scaler, scheduler, wd_scheduler
+
+
+def get_args():
+    parser = argparse.ArgumentParser(description='I-JEPA training')
+    parser.add_argument('--config', type=str, help='Path to the config file', required=True)
+    args = parser.parse_args()
+    with open(args.config, 'r') as f:
+        config = yaml.safe_load(f)
+    return config

@@ -1,1 +1,21 @@
+# Python
 *.pyc
+__pycache__/
+venv/
+
+# Data (large files)
+data/derivatives/
+data/timeseries/
+ds000030/
+*.npy
+*.pth.tar
+
+# Logs and outputs
+logs/
+figures/
+
+# System
+.DS_Store
+
+# Markdown docs (optional)
+*.md
