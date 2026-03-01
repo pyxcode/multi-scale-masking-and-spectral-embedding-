@@ -18,4 +18,4 @@ figures/
 .DS_Store
 
 # Markdown docs (optional)
-*.md
+METHODOLOGY.md
