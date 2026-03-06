@@ -19,7 +19,7 @@ from torch.nn.parallel import DistributedDataParallel
 
 # Imports locaux
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from losses.sigreg import sigreg_loss
+from losses.vicreg import vicreg_loss
 from masks.utils import apply_masks
 from utils.distributed import init_distributed, AllReduce
 from utils.logging import (
@@ -51,7 +51,7 @@ def main(args, resume_preempt=False):
     #  PARAMÈTRES DEPUIS LE FICHIER CONFIG
     # ----------------------------------------------------------------------- #
     use_bfloat16 = args['meta']['use_bfloat16']
-    use_sigreg = args['meta'].get('use_sigreg', True)
+    use_vicreg = args['meta'].get('use_vicreg', True)
     use_multiscale = args['meta'].get('use_multiscale', True)
     accumulation_steps = args['meta']['accumulation_steps']
     attn_mode = args['meta']['attn_mode']
@@ -215,8 +215,8 @@ def main(args, resume_preempt=False):
                     
                     # Loss
                     p_loss = F.smooth_l1_loss(z, h)
-                    if use_sigreg:
-                        r_loss = sigreg_loss(z, lambda_reg=0.04)
+                    if use_vicreg:
+                        r_loss = vicreg_loss(z, lambda_reg=0.04)
                         loss = (p_loss + r_loss) / accumulation_steps
                     else:
                         loss = p_loss / accumulation_steps

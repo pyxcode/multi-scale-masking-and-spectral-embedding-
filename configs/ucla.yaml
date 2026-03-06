@@ -1,7 +1,7 @@
 # configs/ucla.yaml
 meta:
   use_bfloat16: true
-  use_sigreg: true        # false = smooth_l1 only (Brain-JEPA original)
+  use_vicreg: true        # false = smooth_l1 only (Brain-JEPA original)
   use_multiscale: true    # false = single-scale masking (Brain-JEPA original)
   accumulation_steps: 8
   attn_mode: normal   # flash_attn requires CUDA

@@ -32,7 +32,7 @@ import torch
 import torch.multiprocessing as mp
 import torch.nn.functional as F
 from torch.nn.parallel import DistributedDataParallel
-from src.losses.sigreg import sigreg_loss
+from src.losses.vicreg import vicreg_loss
 
 from src.masks.utils import apply_masks
 from src.utils.distributed import (
@@ -323,7 +323,7 @@ def main(args, resume_preempt=False):
 
                 def loss_fn(z, h):
                     pred_loss = F.smooth_l1_loss(z, h)
-                    reg_loss = sigreg_loss(z, lambda_reg=0.04)
+                    reg_loss = vicreg_loss(z, lambda_reg=0.04)
                     loss = pred_loss + reg_loss
                     loss = AllReduce.apply(loss)
                     return loss / accumulation_steps

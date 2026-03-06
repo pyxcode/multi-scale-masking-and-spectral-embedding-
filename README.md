@@ -1,4 +1,4 @@
-# Multi-Scale Masking & SIGReg for Brain-JEPA
+# Multi-Scale Masking & VICReg for Brain-JEPA
 
 Exploring multi-scale temporal masking and spectral regularization for fMRI self-supervised learning.
 
@@ -7,7 +7,7 @@ Based on [Brain-JEPA](https://github.com/Eric-LRL/Brain-JEPA) (NeurIPS 2024).
 ## What's different
 
 - **Multi-scale masking**: predicting targets at short (~10s), medium (~48s), and long (~144s) temporal scales instead of single-scale
-- **SIGReg loss**: spectral regularization to prevent representation collapse
+- **VICReg loss**: spectral regularization to prevent representation collapse
 - **UCLA dataset**: tested on UCLA CNP (261 subjects, gender classification)
 
 ## Setup
@@ -27,7 +27,7 @@ PYTHONPATH=. torchrun --nproc_per_node=1 src/trainv2.py --config configs/ucla.ya
 
 Configs:
 - `ucla_baseline.yaml` - original Brain-JEPA (single-scale, smooth L1 only)
-- `ucla_sigreg.yaml` - + SIGReg loss
+- `ucla_vicreg.yaml` - + VICReg loss
 - `ucla_multiscale.yaml` - + multi-scale masking
 - `ucla.yaml` - both
 
@@ -45,7 +45,7 @@ python linear_probe.py --checkpoint logs/ucla_*/ucla_train-latest.pth.tar
 |--------|-----|
 | Baseline | 0.54 |
 | +Multiscale | 0.54 |
-| +SIGReg | 0.56 |
+| +VICReg | 0.56 |
 | S+M | 0.57 |
 
 Differences not statistically significant (~3% variance between runs).

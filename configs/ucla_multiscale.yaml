@@ -1,8 +1,8 @@
 # configs/ucla_baseline.yaml
-# Brain-JEPA original (sans multiscale, sans sigreg)
+# Brain-JEPA original (sans multiscale, sans vicreg)
 meta:
   use_bfloat16: true
-  use_sigreg: false       # smooth_l1 only (Brain-JEPA original)
+  use_vicreg: false       # smooth_l1 only (Brain-JEPA original)
   use_multiscale: true   # single-scale masking (Brain-JEPA original)
   accumulation_steps: 8
   attn_mode: normal
